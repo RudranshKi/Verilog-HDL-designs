@@ -1,6 +1,8 @@
-/* q.  Design a Vending Machine whcih only accepts 10/- or 5/- and gives a coke for only when the total sum of money is 15/-
-It doesn't return any surplus money    */
+/* q.  Design a Vending Machine whcih only accepts 10/- or 5/- and gives a coke for only when the total sum of money is 15/- . It doesn't return any surplus money   
 
+
+
+simulation link - https://www.edaplayground.com/x/gXSh    */
 
 
 
