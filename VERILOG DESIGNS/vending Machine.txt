@@ -1,0 +1,73 @@
+/* q.  Design a Vending Machine whcih only accepts 10/- or 5/- and gives a coke for only when the total sum of money is 15/-
+It doesn't return any surplus money    */
+
+
+
+
+
+/* DESIGN  */
+
+//////////////////////
+module vending_machine(money,x,clk,reset,coke);
+  input [5:0] money;
+  input [1:0] x;
+  input clk , reset ;
+  reg [1:0] state , next_state ;
+  output reg coke ;
+  parameter s0 = 2'b00 , s5 = 2'b01 , s10 = 2'b10 , s15 = 2'b11 ;
+  parameter re5 = 2'b01 , re10 = 2'b10 , re0 = 2'b00 ;
+  
+  always@( posedge clk , reset )
+    if ( ~reset )
+       state <= s0 ;
+  else state <= next_state;
+  
+  always@( state , x ) begin
+    case ( state )
+      s0  : next_state = ( x == re5 ) ? s5   : (( x == re10) ? s10 : 0) ; 
+      s5  : next_state = ( x == re5 ) ? s10  : (( x == re10) ? s15 : 0) ; 
+      s10 : next_state = ( x == re5 ) ? s15  : (( x == re10) ? s15 : 0) ; 
+      s15 : next_state = s0 ;
+   endcase
+  end
+  
+  always@( state , money ) begin
+    coke = ( state == s15 ) ? 1 : 0;
+  end  
+  
+endmodule
+
+////////////////////////////////////////////////////////////////////////////
+
+/* TESTMODEL */
+
+//////////////////
+
+module testbench;
+  reg [5:0] money;
+  reg [1:0] x;
+  reg clk, reset ;
+  wire coke;
+  
+  vending_machine vm(money,x,clk,reset,coke);
+  
+  always #5 clk = ~clk;
+  
+  initial begin
+    $dumpfile("testbench.vcd");
+    $dumpvars(1,testbench);
+        money = 6'b010101;
+        clk  = 0;
+        reset= 0;
+     #10  reset=1;
+
+    
+    #60 $finish;
+    
+  end
+  
+  always@(posedge clk) begin
+    money <=  money>>2;
+    x     <=  money[1:0];
+  end
+endmodule

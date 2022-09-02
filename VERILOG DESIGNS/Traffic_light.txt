@@ -1,0 +1,115 @@
+/* q. Design a traffic post which will change green to yellow in 8 sec, yellow to red in 2sec and red    */
+
+
+
+
+
+
+
+/*   DESIGN   */
+
+//////////////////////////////////////////////////////////////////
+
+
+module traffic_light(clk,reset,North,East,South,West);
+  input clk, reset;
+  output reg [2:0] North,East,South,West;
+  reg [4:0] current;
+  //reg x;
+  parameter s_North = 2'b00, s_East = 2'b01, s_South = 2'b10, s_West = 2'b11;
+  
+  
+  always@( posedge clk, reset , current[2] ) begin
+    if (reset) begin
+      {North,East,South,West} <= 0 ;
+      current = 5'b00000 ;
+    end
+  else  begin
+    
+    case (current[4:3])
+      
+   s_North  : begin 
+              East  <= 3'b100;
+              South <= 3'b100;
+              West  <= 3'b100;
+              case (current[2:0])
+                0 : begin      North <= 3'b001; current[2:0] <= 3'b010;end
+                2 : begin  #8  North <= 3'b010; current[2:0] <= 3'b100;end
+               endcase
+              if (current[2:0] == 3'b100) current <= 5'b01001; 
+              end
+      
+    s_East  : begin 
+           #2 North  <= 3'b100;
+              South  <= 3'b100;
+              West   <= 3'b100;
+      
+              case (current[2:0])
+                   1 : begin    East  <= 3'b001; current[2:0] <= 3'b010; end
+                   2 : begin #8 East  <= 3'b010; current[2:0] <= 3'b100; end
+               endcase
+              if (current[2:0] == 3'b100) current <= 5'b10001;
+              end
+  
+     s_South : begin  
+               North  <= 3'b100;
+            #2 East   <= 3'b100;
+               West   <= 3'b100;
+      
+               case (current[2:0])
+                    1 : begin    South <= 3'b001; current[2:0] <= 3'b010; end
+                    2 : begin #8 South <= 3'b010; current[2:0] <= 3'b100; end
+                endcase
+               if (current[2:0] == 3'b100) current <= 5'b11001;
+               end      
+      
+   
+     s_West   : begin
+                North  <= 3'b100;
+             #2 South  <= 3'b100;
+                East   <= 3'b100;
+      
+              case (current[2:0])
+                    1 : begin    West <= 3'b001; current[2:0] <= 3'b010; end
+                    2 : begin #8 West <= 3'b010; current[2:0] <= 3'b100; end
+               endcase
+       if (current[2:0] == 3'b100) current <= 5'b00000;
+              end   
+   
+    endcase
+  end
+  end
+    endmodule
+        
+ ////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+/* TESTMODEL */
+
+////////////////////////////////////////////////////////////////////////
+
+module tb_traffic_light;
+  reg clk,reset;
+  wire [2:0] North,East,South,West;
+  
+  
+  traffic_light tfl(clk,reset,North,East,South,West);
+  
+  
+  always #5 clk = ~clk ;
+  
+  initial begin
+   $dumpfile("tb_traffic_light.vcd");
+   $dumpvars(1,tb_traffic_light);
+   $monitor("time=%0d North=%b East=%b South=%b West=%b",$time,North,East,South,West);
+    clk   = 0;
+    reset = 1;
+    
+    
+ #5 reset = 0;
+ #230 $finish;
+  end
+endmodule

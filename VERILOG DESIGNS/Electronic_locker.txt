@@ -1,0 +1,94 @@
+/* q. Design a electronic locker which will only open after inputting 01011 pin  */
+
+
+
+
+
+
+
+/* DESIGN   */
+
+//////////////////////////////////////////////////////////////////////
+
+
+
+module locker(clk,b1in,b0in,reset,lock,st);
+  input b1in,b0in,reset,clk;
+  output reg lock;
+  output [2:0] st;
+  reg [2:0] state,next_state;
+  parameter s0 = 3'd0, s01 = 3'd1, s010 = 3'd2, s0101 = 3'd3, s01011 = 3'd4;
+  
+/*  begin clk = 0;
+  always #5 clk <= ~clk;
+  end  */
+  always@(posedge clk,reset)
+    if (reset)  begin 
+      state <= s0 ;
+      lock  <=  0 ;
+    end
+  else
+      state <= next_state;
+   
+  always@(state,b0in,b1in) begin
+    case (state)
+    
+      s0     : if (b1in==1 && b0in==0) begin next_state <= s01   ; lock <= 0 ; end else begin next_state <= s0   ; lock <= 0 ; end
+      s01    : if (b1in==0 && b0in==1) begin next_state <= s010  ; lock <= 0 ; end else begin next_state <= s0   ; lock <= 0 ; end
+      s010   : if (b1in==1 && b0in==0) begin next_state <= s0101 ; lock <= 0 ; end else begin next_state <= s0   ; lock <= 0 ; end
+      s0101  : if (b1in==1 && b0in==0) begin next_state <= s0    ; lock <= 1 ; end else begin next_state <= s010 ; lock <= 0 ; end
+//      s01011 : if ((b1in==1 && b0in==0) | (b1in==0 && b0in==1)) begin next_state <= s0   ; lock <= 0 ; end
+//      s0101  : if (b1in==1 && b0in==0) begin next_state <= s0; lock <= 1 ; end else begin next_state <= s0 ; lock <= 0 ; end
+      
+    endcase
+  end
+  assign st = state;
+endmodule
+      
+
+
+/////////////////////////////////////////////////////////////////////////
+
+
+
+/*  TESTMODEL    */
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+module testbench;
+  wire lock;
+  reg b1in,b0in,reset,clk,x;
+  reg [15:0] data;
+  wire [2:0] st;
+  locker tbl(clk,b1in,b0in,reset,lock,st);
+  
+  always #5 clk <= ~clk;
+  
+  initial begin
+    $dumpfile("testbench.vcd");
+    $dumpvars(1,testbench);
+    reset =1;
+    #10 reset = 0;
+    clk = 0;
+    data = 16'b1011010110101001;
+    
+    #400 $finish;
+    
+  end
+  
+ always@(posedge clk) begin
+   data <= data>>1 ;
+   x <= data[0];
+   if (x == 1'b1) begin
+     b1in<=1;
+     b0in<=0;
+   end
+   else begin
+     b0in<=1;
+     b1in<=0;
+   end
+  end
+endmodule
