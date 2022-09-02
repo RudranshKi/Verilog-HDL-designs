@@ -1,7 +1,7 @@
-/* q. Design a electronic locker which will only open after inputting 01011 pin  */
+/* q. Design a electronic locker which will only open after inputting 01011 pin  
 
 
-
+simulation link - https://www.edaplayground.com/x/P22B      */
 
 
 
