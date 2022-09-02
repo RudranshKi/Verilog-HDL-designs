@@ -1,7 +1,6 @@
-/* q. Design a traffic post which will change green to yellow in 8 sec, yellow to red in 2sec and red    */
+/* q. Design a traffic post which will change green to yellow in 8 sec, yellow to red in 2sec and red    
 
-
-
+simulation link - https://www.edaplayground.com/x/SzYT   */
 
 
 
